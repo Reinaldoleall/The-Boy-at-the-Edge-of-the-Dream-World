@@ -1,0 +1,43 @@
+{
+  "player": {
+    "idle": ["./webp/I.webp", "./webp/I1.webp", "./webp/I2.webp", "./webp/I3.webp", "./webp/I4.webp", "./webp/I5.webp", "./webp/I6.webp"],
+    "walk": ["./webp/1.webp", "./webp/2.webp", "./webp/3.webp", "./webp/4.webp", "./webp/5.webp", "./webp/6.webp", "./webp/7.webp", "./webp/8.webp", "./webp/9.webp", "./webp/10.webp", "./webp/11.webp", "./webp/12.webp", "./webp/13.webp", "./webp/14.webp", "./webp/15.webp"],
+    "run_shoot": ["./webp/1c.webp", "./webp/2c.webp", "./webp/3c.webp", "./webp/4c.webp", "./webp/5c.webp", "./webp/6c.webp", "./webp/7c.webp", "./webp/8c.webp", "./webp/9c.webp", "./webp/10c.webp", "./webp/11c.webp", "./webp/12c.webp", "./webp/13c.webp", "./webp/14c.webp", "./webp/15c.webp", "./webp/16c.webp"],
+    "jump": ["./webp/p.webp", "./webp/p3.webp", "./webp/p4.webp", "./webp/p9.webp", "./webp/p11.webp", "./webp/p15.webp", "./webp/p16.webp", "./webp/p17.webp"],
+    "crouch": ["./webp/b1.webp", "./webp/b2.webp", "./webp/b3.webp", "./webp/b4.webp", "./webp/b5.webp", "./webp/b6.webp", "./webp/b7.webp", "./webp/b8.webp", "./webp/b9.webp", "./webp/b10.webp"],
+    "block": ["./webp/defesa.webp"],
+    "special": ["https://i.imgur.com/L127z5k.gif"],
+    "attack_sword": ["./webp/espada1.webp", "./webp/espada2.webp", "./webp/espada3.webp"],
+    "attack_pistol": ["./webp/a1.webp", "./webp/a2.webp", "./webp/a3.webp", "./webp/a4.webp", "./webp/a5.webp", "./webp/a6.webp", "./webp/a7.webp", "./webp/a8.webp", "./webp/a9.webp", "./webp/a10.webp", "./webp/a11.webp", "./webp/a12.webp"],
+    "bow_charge": ["./webp/chute.webp"],
+    "shield": {
+      "normal": ["./webp/esc.webp", "./webp/esc1.webp", "./webp/esc2.webp", "./webp/esc3.webp", "./webp/esc4.webp", "./webp/esc5.webp", "./webp/esc6.webp", "./webp/esc7.webp", "./webp/esc8.webp", "./webp/esc9.webp", "./webp/esc10.webp", "./webp/esc11.webp"],
+      "crack": ["./webp/esc12.webp", "./webp/esc13.webp", "./webp/esc14.webp", "./webp/esc15.webp", "./webp/esc16.webp"]
+    }
+  },
+  "enemies": {
+    "ground_walk": ["./webp/d.webp", "./webp/d1.webp", "./webp/d2.webp", "./webp/d3.webp", "./webp/d4.webp", "./webp/d5.webp", "./webp/d6.webp", "./webp/d7.webp", "./webp/d8.webp", "./webp/d9.webp", "./webp/d10.webp", "./webp/d11.webp", "./webp/d12.webp", "./webp/d13.webp", "./webp/d14.webp"],
+    "flyer": ["./webp/nave.webp", "./webp/nave1.webp", "./webp/nave2.webp", "./webp/nave3.webp", "./webp/nave4.webp", "./webp/nave5.webp", "./webp/nave6.webp", "./webp/nave7.webp", "./webp/nave8.webp", "./webp/nave9.webp"],
+    "baby_fall": ["./webp/bebe6.webp"],
+    "baby_run": ["./webp/bebe.webp", "./webp/bebe1.webp", "./webp/bebe2.webp", "./webp/bebe3.webp", "./webp/bebe4.webp", "./webp/bebe5.webp"],
+    "dead": ["./webp/dinossauro_morto.webp"]
+  },
+  "boss": {
+    "activate": ["./webp/monstro_ativo.webp", "./webp/monstro_ativo1.webp", "./webp/monstro_ativo2.webp"],
+    "idle": ["./webp/mloop.webp", "./webp/mloop2.webp", "./webp/mloop3.webp", "./webp/mloop4.webp", "./webp/mloop5.webp", "./webp/mloop6.webp", "./webp/mloop7.webp", "./webp/mloop8.webp"],
+    "attack_1": ["./webp/ataque.webp", "./webp/ataque1.webp", "./webp/ataque2.webp", "./webp/ataque3.webp", "./webp/ataque4.webp", "./webp/ataque5.webp", "./webp/ataque6.webp", "./webp/ataque7.webp", "./webp/ataque8.webp", "./webp/ataque9.webp", "./webp/ataque10.webp", "./webp/ataque11.webp", "./webp/ataque12.webp", "./webp/ataque13.webp", "./webp/ataque14.webp", "./webp/ataque15.webp", "./webp/ataque16.webp"],
+    "attack_2": ["./webp/ataque01.webp", "./webp/ataque02.webp", "./webp/ataque03.webp", "./webp/ataque04.webp", "./webp/ataque05.webp", "./webp/ataque06.webp", "./webp/ataque07.webp", "./webp/ataque08.webp", "./webp/ataque09.webp"],
+    "death": ["./webp/bossdeath(1).webp", "./webp/bossdeath(2).webp", "./webp/bossdeath(3).webp", "./webp/bossdeath(4).webp", "./webp/bossdeath(5).webp", "./webp/bossdeath(6).webp", "./webp/bossdeath(7).webp", "./webp/bossdeath(8).webp", "./webp/bossdeath(9).webp", "./webp/bossdeath(10).webp", "./webp/bossdeath(11).webp", "./webp/bossdeath(12).webp", "./webp/bossdeath(13).webp", "./webp/bossdeath(14).webp", "./webp/bossdeath(15).webp", "./webp/bossdeath(16).webp", "./webp/bossdeath(17).webp", "./webp/bossdeath(18).webp", "./webp/bossdeath(19).webp", "./webp/bossdeath(20).webp", "./webp/bossdeath(21).webp", "./webp/bossdeath (22).webp", "./webp/bossdeath(23).webp", "./webp/bossdeath(24).webp", "./webp/bossdeath(25).webp", "./webp/bossdeath(26).webp", "./webp/bossdeath(27).webp", "./webp/bossdeath(28).webp", "./webp/bossdeath(29).webp", "./webp/bossdeath(30).webp", "./webp/bossdeath(31).webp", "./webp/bossdeath(32).webp", "./webp/bossdeath(33).webp"]
+  },
+  "items": {
+    "coin": "./webp/coin.webp",
+    "sword_icon": "./webp/espada.webp",
+    "bow_pickup": "./webp/pedra.webp",
+    "pistol_pickup": "./webp/tiro.webp"
+  },
+  "environment": {
+    "pit": "./webp/espinhos.webp",
+    "barrier": "./webp/boss_barrier.webp",
+    "backgrounds": ["./webp/16.webp", "./webp/chao01.webp", "./webp/chao02.webp", "./webp/arvore.webp", "./webp/nature.webp", "./webp/nuvens.webp", "./webp/nuvenss.webp", "./webp/heart.webp"]
+  }
+}

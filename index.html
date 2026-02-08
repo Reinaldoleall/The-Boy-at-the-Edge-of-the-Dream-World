@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Boy who Dreamt The World</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Quicksand:wght@300;500&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background: #000;
+    overflow: hidden;
+    font-family: 'Quicksand', sans-serif;
+    color: #fff;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* BACKGROUND COM WEBP ANIMADO + CROSSFADE */
+.video-container {
+    position: fixed;
+    inset: 0;
+    z-index: -4;
+    background: #000;
+}
+
+.video-container img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.4) contrast(1.2);
+    transition: opacity 2s ease-in-out;
+    pointer-events: none;
+    will-change: opacity;
+}
+
+/* OVERLAY */
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 100%);
+    z-index: -3;
+}
+
+/* PARTÍCULAS */
+#particles-small, #particles-bokeh {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+
+#particles-small { z-index: -2; }
+
+#particles-bokeh {
+    z-index: -1;
+    filter: blur(5px) contrast(1.2);
+}
+
+/* ESTRUTURA */
+.main-screen {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    padding: 0 10%;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 10;
+}
+
+.title-section {
+    flex: 1.2;
+    animation: fadeInBlur 2.5s ease-out;
+}
+
+.game-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 0.9;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    text-shadow: 0 0 30px rgba(135, 207, 235, 0.6);
+}
+
+.game-subtitle {
+    font-size: 1.1rem;
+    letter-spacing: 10px;
+    color: #87ceeb;
+    opacity: 0.8;
+}
+
+.menu-section {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: flex-end;
+    animation: fadeInRight 1.5s ease-out 0.5s both;
+}
+
+.menu-link {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+.menu-link:hover {
+    color: #fff;
+    transform: scale(1.05);
+}
+
+/* CRÉDITOS */
+#credits-screen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.credits-content {
+    text-align: center;
+    animation: scrollCredits 15s linear forwards;
+}
+
+.btn-back {
+    position: absolute;
+    bottom: 50px;
+    background: none;
+    border: 1px solid rgba(135,207,235,0.4);
+    color: #87ceeb;
+    padding: 10px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+@keyframes fadeInBlur {
+    from { opacity: 0; filter: blur(15px); }
+    to { opacity: 1; filter: blur(0); }
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scrollCredits {
+    from { transform: translateY(80%); }
+    to { transform: translateY(-80%); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="particles-small"></div>
+<div id="particles-bokeh"></div>
+
+<!-- WEBP ANIMADO COM CROSSFADE -->
+<div class="video-container">
+    <img id="bg1" src="./Iniciar.webp">
+    <img id="bg2" src="./Iniciar.webp" style="opacity:0">
+    <div class="overlay"></div>
+</div>
+
+<main class="main-screen" id="main-menu">
+    <section class="title-section">
+        <h1 class="game-title">The Boy Who<br>Dreamt The World</h1>
+        <p class="game-subtitle">O menino que sonhou o mundo</p>
+    </section>
+
+    <section class="menu-section">
+        <button class="menu-link" onclick="handleNavigation('play')">Iniciar Jogo</button>
+        <button class="menu-link" onclick="handleNavigation('continue')">Continuar</button>
+        <button class="menu-link" onclick="showCredits()">Créditos</button>
+    </section>
+</main>
+
+<div id="credits-screen">
+    <div class="credits-content">
+        <h3>Uma Produção Independente</h3>
+        <p>Criação, Código e Design</p>
+        <h2>Reinaldo Leal</h2>
+    </div>
+    <button class="btn-back" onclick="hideCredits()">Voltar</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+<script>
+/* CROSSFADE DO WEBP ANIMADO */
+const bg1 = document.getElementById('bg1');
+const bg2 = document.getElementById('bg2');
+
+let showingFirst = true;
+
+/*
+ ⏱️ DURAÇÃO TOTAL DO WEBP (ms)
+ ajuste exatamente para a duração do seu WebP animado
+*/
+const WEBP_DURATION = 8000;
+
+setInterval(() => {
+    if (showingFirst) {
+        bg1.style.opacity = 0;
+        bg2.style.opacity = 1;
+        bg1.src = bg1.src.split('?')[0] + '?t=' + Date.now();
+    } else {
+        bg2.style.opacity = 0;
+        bg1.style.opacity = 1;
+        bg2.src = bg2.src.split('?')[0] + '?t=' + Date.now();
+    }
+    showingFirst = !showingFirst;
+}, WEBP_DURATION - 2000);
+
+/* PARTÍCULAS */
+particlesJS("particles-small", {
+    particles: {
+        number: { value: 50 },
+        opacity: { value: 0.5, random: true },
+        size: { value: 1.5, random: true },
+        move: { enable: true, speed: 0.8, direction: "top" }
+    }
+});
+
+particlesJS("particles-bokeh", {
+    particles: {
+        number: { value: 20 },
+        size: { value: 45, random: true },
+        opacity: { value: 0.6, random: true },
+        move: { enable: true, speed: 0.4 }
+    }
+});
+
+/* NAVEGAÇÃO */
+function handleNavigation(dest) {
+    document.getElementById('main-menu').style.opacity = 0;
+    setTimeout(() => {
+        location.href = dest === 'play'
+            ? './intro.html'
+            : './intro.html?continue=true';
+    }, 1000);
+}
+
+function showCredits() {
+    document.getElementById('main-menu').style.display = 'none';
+    const c = document.getElementById('credits-screen');
+    c.style.display = 'flex';
+    setTimeout(()=>c.style.opacity=1,50);
+}
+
+function hideCredits() {
+    const c = document.getElementById('credits-screen');
+    c.style.opacity = 0;
+    setTimeout(()=>{
+        c.style.display = 'none';
+        document.getElementById('main-menu').style.display = 'flex';
+    },1000);
+}
+</script>
+
+</body>
+</html>

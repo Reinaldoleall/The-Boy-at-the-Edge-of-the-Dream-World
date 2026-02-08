@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <div id="game-scaler">
+        <div id="game-container">
+            <div id="parallax-nature-bg"></div>
+            <div id="sky-background">
+                <div class="fog-layer"></div>
+            </div>
+            <div id="boss-ui" style="display: none;">
+                <div id="boss-name">Enraizado</div>
+                <div id="boss-health-container">
+                    <div id="boss-health-bar"></div>
+                </div>
+            </div>
+            <div id="game-world">
+                <div class="layer" id="foreground"></div>
+                <div class="layer" id="ground"></div>
+                <div class="cloud-layer-1"></div>
+                <div class="cloud-layer-2"></div>
+                <div class="cloud-layer-3"></div>
+                <div class="cloud-layer-4"></div>
+                <div id="arvore1"></div>
+                <div id="arvore2"></div>
+                <div id="casa"></div>
+                <div id="casa1"></div>
+                <div id="seta"></div>
+            </div>
+
+            <div class="damage-effect"></div>
+            <div id="ui-container">
+                <div id="hud-dashboard">
+                    <div class="hud-row top">
+                        <div class="health-container"></div>
+                        <div class="points-display-compact">0</div>
+                    </div>
+                    <div class="hud-row bottom">
+                        <div id="weapon-slots-container"></div>
+                        <div class="special-container">
+                            <div class="special-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="controls-overlay">
+                <div class="analog-container">
+                    <div class="analog-base"></div>
+                    <div class="analog-stick"></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn" id="btn-jump">Pular</button>
+                    <button class="action-btn" id="btn-attack">Atacar</button>
+                    <button class="action-btn" id="btn-block">Def</button>
+                    <button class="action-btn" id="btn-special">SP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="preload-images" style="display: none;">
+        <!-- Player -->
+        <img src="./webp/I.webp" alt="">
+        <img src="./webp/I1.webp" alt="">
+        <img src="./webp/I2.webp" alt="">
+        <img src="./webp/I3.webp" alt="">
+        <img src="./webp/I4.webp" alt="">
+        <img src="./webp/I5.webp" alt="">
+        <img src="./webp/I6.webp" alt="">
+
+        <!-- Walk -->
+        <img src="./webp/1.webp" alt="">
+        <img src="./webp/2.webp" alt="">
+        <img src="./webp/3.webp" alt="">
+        <img src="./webp/4.webp" alt="">
+        <img src="./webp/5.webp" alt="">
+        <img src="./webp/6.webp" alt="">
+        <img src="./webp/7.webp" alt="">
+        <img src="./webp/8.webp" alt="">
+        <img src="./webp/9.webp" alt="">
+        <img src="./webp/10.webp" alt="">
+        <img src="./webp/11.webp" alt="">
+        <img src="./webp/12.webp" alt="">
+        <img src="./webp/13.webp" alt="">
+        <img src="./webp/14.webp" alt="">
+        <img src="./webp/15.webp" alt="">
+
+        <!-- Run Shoot -->
+        <img src="./webp/1c.webp" alt="">
+        <img src="./webp/2c.webp" alt="">
+        <img src="./webp/3c.webp" alt="">
+        <img src="./webp/4c.webp" alt="">
+        <img src="./webp/5c.webp" alt="">
+        <img src="./webp/6c.webp" alt="">
+        <img src="./webp/7c.webp" alt="">
+        <img src="./webp/8c.webp" alt="">
+        <img src="./webp/9c.webp" alt="">
+        <img src="./webp/10c.webp" alt="">
+        <img src="./webp/11c.webp" alt="">
+        <img src="./webp/12c.webp" alt="">
+        <img src="./webp/13c.webp" alt="">
+        <img src="./webp/14c.webp" alt="">
+        <img src="./webp/15c.webp" alt="">
+        <img src="./webp/16c.webp" alt="">
+
+        <!-- Jump -->
+        <img src="./webp/p.webp" alt="">
+        <img src="./webp/p3.webp" alt="">
+        <img src="./webp/p4.webp" alt="">
+        <img src="./webp/p9.webp" alt="">
+        <img src="./webp/p11.webp" alt="">
+        <img src="./webp/p15.webp" alt="">
+        <img src="./webp/p16.webp" alt="">
+        <img src="./webp/p17.webp" alt="">
+
+        <!-- Crouch -->
+        <img src="./webp/b1.webp" alt="">
+        <img src="./webp/b2.webp" alt="">
+        <img src="./webp/b3.webp" alt="">
+        <img src="./webp/b4.webp" alt="">
+        <img src="./webp/b5.webp" alt="">
+        <img src="./webp/b6.webp" alt="">
+        <img src="./webp/b7.webp" alt="">
+        <img src="./webp/b8.webp" alt="">
+        <img src="./webp/b9.webp" alt="">
+        <img src="./webp/b10.webp" alt="">
+
+        <!-- Shield -->
+        <img src="./webp/esc.webp" alt="">
+        <img src="./webp/esc1.webp" alt="">
+        <img src="./webp/esc2.webp" alt="">
+        <img src="./webp/esc3.webp" alt="">
+        <img src="./webp/esc4.webp" alt="">
+        <img src="./webp/esc5.webp" alt="">
+        <img src="./webp/esc6.webp" alt="">
+        <img src="./webp/esc7.webp" alt="">
+        <img src="./webp/esc8.webp" alt="">
+        <img src="./webp/esc9.webp" alt="">
+        <img src="./webp/esc10.webp" alt="">
+        <img src="./webp/esc11.webp" alt="">
+        <img src="./webp/esc12.webp" alt="">
+        <img src="./webp/esc13.webp" alt="">
+        <img src="./webp/esc14.webp" alt="">
+        <img src="./webp/esc15.webp" alt="">
+        <img src="./webp/esc16.webp" alt="">
+
+        <!-- Enemy -->
+        <img src="./webp/dinossauro_morto.webp" alt="">
+
+        <!-- Enemy Walk -->
+        <img src="./webp/d.webp" alt="">
+        <img src="./webp/d1.webp" alt="">
+        <img src="./webp/d2.webp" alt="">
+        <img src="./webp/d3.webp" alt="">
+        <img src="./webp/d4.webp" alt="">
+        <img src="./webp/d5.webp" alt="">
+        <img src="./webp/d6.webp" alt="">
+        <img src="./webp/d7.webp" alt="">
+        <img src="./webp/d8.webp" alt="">
+        <img src="./webp/d9.webp" alt="">
+        <img src="./webp/d10.webp" alt="">
+        <img src="./webp/d11.webp" alt="">
+        <img src="./webp/d12.webp" alt="">
+        <img src="./webp/d13.webp" alt="">
+        <img src="./webp/d14.webp" alt="">
+
+        <!-- Flying Enemy -->
+        <img src="./webp/nave.webp" alt="">
+        <img src="./webp/nave1.webp" alt="">
+        <img src="./webp/nave2.webp" alt="">
+        <img src="./webp/nave3.webp" alt="">
+        <img src="./webp/nave4.webp" alt="">
+        <img src="./webp/nave5.webp" alt="">
+        <img src="./webp/nave6.webp" alt="">
+        <img src="./webp/nave7.webp" alt="">
+        <img src="./webp/nave8.webp" alt="">
+        <img src="./webp/nave9.webp" alt="">
+
+        <!-- Attacks -->
+        <img src="./webp/espada1.webp" alt="">
+        <img src="./webp/espada2.webp" alt="">
+        <img src="./webp/espada3.webp" alt="">
+        <img src="./webp/chute.webp" alt="">
+        <img src="./webp/a1.webp" alt="">
+        <img src="./webp/a2.webp" alt="">
+        <img src="./webp/a3.webp" alt="">
+        <img src="./webp/a4.webp" alt="">
+        <img src="./webp/a5.webp" alt="">
+        <img src="./webp/a6.webp" alt="">
+        <img src="./webp/a7.webp" alt="">
+        <img src="./webp/a8.webp" alt="">
+        <img src="./webp/a9.webp" alt="">
+        <img src="./webp/a10.webp" alt="">
+        <img src="./webp/a11.webp" alt="">
+        <img src="./webp/a12.webp" alt="">
+        <img src="./webp/defesa.webp" alt="">
+
+        <!-- Weapons -->
+        <img src="./webp/pedra.webp" alt="">
+        <img src="./webp/tiro.webp" alt="">
+        <img src="./webp/espada.webp" alt="">
+        <img src="./webp/coin.webp" alt="">
+
+        <!-- Boss -->
+        <img src="./webp/boss_barrier.webp" alt="">
+        <img src="./webp/monstro_ativo.webp" alt="">
+        <img src="./webp/monstro_ativo1.webp" alt="">
+        <img src="./webp/monstro_ativo2.webp" alt="">
+        <img src="./webp/mloop.webp" alt="">
+        <img src="./webp/mloop2.webp" alt="">
+        <img src="./webp/mloop3.webp" alt="">
+        <img src="./webp/mloop4.webp" alt="">
+        <img src="./webp/mloop5.webp" alt="">
+        <img src="./webp/mloop6.webp" alt="">
+        <img src="./webp/mloop7.webp" alt="">
+        <img src="./webp/mloop8.webp" alt="">
+
+        <!-- Boss Attacks -->
+        <img src="./webp/ataque.webp" alt="">
+        <img src="./webp/ataque1.webp" alt="">
+        <img src="./webp/ataque2.webp" alt="">
+        <img src="./webp/ataque3.webp" alt="">
+        <img src="./webp/ataque4.webp" alt="">
+        <img src="./webp/ataque5.webp" alt="">
+        <img src="./webp/ataque6.webp" alt="">
+        <img src="./webp/ataque7.webp" alt="">
+        <img src="./webp/ataque8.webp" alt="">
+        <img src="./webp/ataque9.webp" alt="">
+        <img src="./webp/ataque10.webp" alt="">
+        <img src="./webp/ataque11.webp" alt="">
+        <img src="./webp/ataque12.webp" alt="">
+        <img src="./webp/ataque13.webp" alt="">
+        <img src="./webp/ataque14.webp" alt="">
+        <img src="./webp/ataque15.webp" alt="">
+        <img src="./webp/ataque16.webp" alt="">
+        <img src="./webp/ataque01.webp" alt="">
+        <img src="./webp/ataque02.webp" alt="">
+        <img src="./webp/ataque03.webp" alt="">
+        <img src="./webp/ataque04.webp" alt="">
+        <img src="./webp/ataque05.webp" alt="">
+        <img src="./webp/ataque06.webp" alt="">
+        <img src="./webp/ataque07.webp" alt="">
+        <img src="./webp/ataque08.webp" alt="">
+        <img src="./webp/ataque09.webp" alt="">
+        <img src="./webp/morte.webp" alt="">
+
+        <!-- New Enemy -->
+        <img src="./webp/bebe6.webp" alt="">
+        <img src="./webp/bebe.webp" alt="">
+        <img src="./webp/bebe1.webp" alt="">
+        <img src="./webp/bebe2.webp" alt="">
+        <img src="./webp/bebe3.webp" alt="">
+        <img src="./webp/bebe4.webp" alt="">
+        <img src="./webp/bebe5.webp" alt="">
+
+        <!-- Extras (escolha os principais) -->
+        <img src="./webp/chao01.webp" alt="">
+        <img src="./webp/chao02.webp" alt="">
+        <img src="./webp/arvore.webp" alt="">
+        <img src="./webp/nature.webp" alt="">
+        <img src="./webp/nuvens.webp" alt="">
+        <img src="./webp/nuvenss.webp" alt="">
+        <img src="./webp/heart.webp" alt="">
+        <img src="./webp/nature.webp" alt="">
+        <img src="./webp/chao01.webp" alt="">
+
+        <!-- Nuvens -->
+        <img src="./webp/nuvens.webp" alt="">
+        <img src="./webp/nuvenss.webp" alt="">
+
+        <!-- Árvores -->
+        <img src="./webp/arvore.webp" alt="">
+
+        <!-- Seta animada -->
+        <img src="./webp/seta.webp" alt="">
+        <img src="./webp/seta1.webp" alt="">
+        <img src="./webp/seta2.webp" alt="">
+        <img src="./webp/seta3.webp" alt="">
+        <img src="./webp/seta4.webp" alt="">
+        <img src="./webp/seta5.webp" alt="">
+        <img src="./webp/seta6.webp" alt="">
+        <img src="./webp/bossdeath(1).webp" alt="">
+        <img src="./webp/bossdeath(2).webp" alt="">
+        <img src="./webp/bossdeath(3).webp" alt="">
+        <img src="./webp/bossdeath(4).webp" alt="">
+        <img src="./webp/bossdeath(5).webp" alt="">
+        <img src="./webp/bossdeath(6).webp" alt="">
+        <img src="./webp/bossdeath(7).webp" alt="">
+        <img src="./webp/bossdeath(8).webp" alt="">
+        <img src="./webp/bossdeath(9).webp" alt="">
+        <img src="./webp/bossdeath(10).webp" alt="">
+        <img src="./webp/bossdeath(11).webp" alt="">
+        <img src="./webp/bossdeath(12).webp" alt="">
+        <img src="./webp/bossdeath(13).webp" alt="">
+        <img src="./webp/bossdeath(14).webp" alt="">
+        <img src="./webp/bossdeath(15).webp" alt="">
+        <img src="./webp/bossdeath(16).webp" alt="">
+        <img src="./webp/bossdeath(17).webp" alt="">
+        <img src="./webp/bossdeath(18).webp" alt="">
+        <img src="./webp/bossdeath(19).webp" alt="">
+        <img src="./webp/bossdeath(20).webp" alt="">
+        <img src="./webp/bossdeath(21).webp" alt="">
+        <img src="./webp/bossdeath(22).webp" alt="">
+        <img src="./webp/bossdeath(23).webp" alt="">
+        <img src="./webp/bossdeath(24).webp" alt="">
+        <img src="./webp/bossdeath(25).webp" alt="">
+        <img src="./webp/bossdeath(26).webp" alt="">
+        <img src="./webp/bossdeath(27).webp" alt="">
+        <img src="./webp/bossdeath(28).webp" alt="">
+        <img src="./webp/bossdeath(29).webp" alt="">
+        <img src="./webp/bossdeath(30).webp" alt="">
+        <img src="./webp/bossdeath(31).webp" alt="">
+        <img src="./webp/bossdeath(32).webp" alt="">
+        <img src="./webp/bossdeath(33).webp" alt="">
+    </div>
+
+    <canvas id="magicCanvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 999;"></canvas>
+
+    <script>
+        (function () {
+            const canvas = document.getElementById('magicCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height, playerElem;
+            const fireflies = [];
+            const particles = [];
+
+            const FF_COUNT = 25;
+            const ATTACK_RANGE = 250; // Distância que eles detectam inimigos
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+
+            class Firefly {
+                constructor() {
+                    this.init();
+                }
+
+                init() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.s = Math.random() * 2 + 1;
+                    this.ang = Math.random() * Math.PI * 2;
+                    this.v = Math.random() * 0.8 + 0.4;
+                    this.orbitAngle = Math.random() * Math.PI * 2;
+                    this.orbitRadius = Math.random() * 50 + 40;
+                    this.wingFrame = 0;
+                    this.opacity = Math.random();
+                    this.lastDamageTime = 0; // Para não dar dano infinito por frame
+                }
+
+                update() {
+                    playerElem = document.querySelector('.character');
+                    const isBlocking = playerElem && (playerElem.classList.contains('shield-active') || playerElem.classList.contains('shield-weak'));
+
+                    if (isBlocking) {
+                        // 1. Procurar inimigo mais próximo
+                        const enemies = document.querySelectorAll('.enemy');
+                        let closestEnemy = null;
+                        let minDist = ATTACK_RANGE;
+
+                        enemies.forEach(en => {
+                            const eRect = en.getBoundingClientRect();
+                            const ex = eRect.left + eRect.width / 2;
+                            const ey = eRect.top + eRect.height / 2;
+                            const d = Math.sqrt((ex - this.x) ** 2 + (ey - this.y) ** 2);
+                            if (d < minDist) {
+                                minDist = d;
+                                closestEnemy = en;
+                            }
+                        });
+
+                        if (closestEnemy) {
+                            // ATACAR INIMIGO
+                            const eRect = closestEnemy.getBoundingClientRect();
+                            const tx = eRect.left + eRect.width / 2 + (Math.random() - 0.5) * 40;
+                            const ty = eRect.top + eRect.height / 2 + (Math.random() - 0.5) * 40;
+
+                            this.x += (tx - this.x) * 0.15;
+                            this.y += (ty - this.y) * 0.15;
+
+                            // Dar dano (1 de dano com cooldown de 1 segundo por vagalume)
+                            const now = Date.now();
+                            if (minDist < 40 && now - this.lastDamageTime > 1000) {
+                                // Tenta achar a instância do inimigo no seu objeto 'game'
+                                // Se não conseguir acessar direto o objeto, usamos um evento customizado
+                                const event = new CustomEvent('vagalumeDamage', {
+                                    detail: { enemy: closestEnemy, damage: 1 }
+                                });
+                                window.dispatchEvent(event);
+                                this.lastDamageTime = now;
+                            }
+                        } else {
+                            // ORBITAR PLAYER (Volta pro Vince)
+                            const pRect = playerElem.getBoundingClientRect();
+                            const tx = (pRect.left + pRect.width / 2) + Math.cos(this.orbitAngle) * this.orbitRadius;
+                            const ty = (pRect.top + pRect.height / 2) + Math.sin(this.orbitAngle) * this.orbitRadius;
+                            this.x += (tx - this.x) * 0.1;
+                            this.y += (ty - this.y) * 0.1;
+                            this.orbitAngle += 0.05;
+                        }
+                        this.opacity = 1;
+                    } else {
+                        // VOO LIVRE
+                        this.x += Math.cos(this.ang) * this.v;
+                        this.y += Math.sin(this.ang) * this.v;
+                        this.ang += (Math.random() - 0.5) * 0.1;
+                        this.opacity = Math.max(0.3, this.opacity + (Math.random() - 0.5) * 0.01);
+                    }
+
+                    this.wingFrame += 0.4;
+                    if (this.x < 0) this.x = width; if (this.x > width) this.x = 0;
+                    if (this.y < 0) this.y = height; if (this.y > height) this.y = 0;
+                }
+
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.strokeStyle = `rgba(255, 255, 200, ${this.opacity * 0.6})`;
+                    const wingW = Math.sin(this.wingFrame) * 5;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0); ctx.lineTo(-wingW, -4);
+                    ctx.moveTo(0, 0); ctx.lineTo(wingW, -4);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.s, 0, Math.PI * 2);
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = "yellow";
+                    ctx.fillStyle = "white";
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            // LISTENER PARA O SEU SISTEMA DE DANO
+            window.addEventListener('vagalumeDamage', (e) => {
+                // Aqui buscamos o inimigo no array do seu jogo
+                if (window.gameInstance && window.gameInstance.enemies) {
+                    const enemyEntity = window.gameInstance.enemies.find(en => en.element === e.detail.enemy);
+                    if (enemyEntity) {
+                        enemyEntity.takeDamage(e.detail.damage);
+                    }
+                }
+            });
+
+            // SISTEMA DE POEIRA (MANTIDO)
+            class Particle {
+                constructor(x, y) {
+                    this.x = x; this.y = y;
+                    this.vx = (Math.random() - 0.5) * 2;
+                    this.vy = -Math.random() * 2;
+                    this.life = 1.0;
+                }
+                update() { this.x += this.vx; this.y += this.vy; this.life -= 0.03; }
+                draw() {
+                    ctx.fillStyle = `rgba(200, 200, 200, ${this.life})`;
+                    ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI * 2); ctx.fill();
+                }
+            }
+
+            function setup() {
+                resize();
+                for (let i = 0; i < FF_COUNT; i++) fireflies.push(new Firefly());
+                window.addEventListener('resize', resize);
+                loop();
+            }
+
+            function loop() {
+                ctx.clearRect(0, 0, width, height);
+                playerElem = document.querySelector('.character');
+
+                // Poeira
+                if (playerElem && Math.random() > 0.8) {
+                    const r = playerElem.getBoundingClientRect();
+                    // Só solta poeira se estiver em movimento (lógica simplificada)
+                    if (playerElem.classList.contains('character')) {
+                        particles.push(new Particle(r.left + r.width / 2, r.bottom));
+                    }
+                }
+
+                fireflies.forEach(f => { f.update(); f.draw(); });
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update(); particles[i].draw();
+                    if (particles[i].life <= 0) particles.splice(i, 1);
+                }
+                requestAnimationFrame(loop);
+            }
+            setup();
+        })();
+
+    </script>
+
+
+    <style>
+        /* Adiciona um pulso extra no personagem quando o escudo está ativo */
+        .character.shield-active {
+            filter: drop-shadow(0 0 60px rgba(255, 255, 130, 0.9)) !important;
+            transition: filter 0.1s ease;
+        }
+    </style>
+
+
+    <script>
+        (() => {
+            const container = document.getElementById("parallax-nature-bg");
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            container.appendChild(canvas);
+
+            let w, h;
+            const setSize = () => {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', setSize);
+            setSize();
+
+            // Configurações leves
+            const GRID_SIZE = 80; // Espaçamento da malha
+            const PARTICLE_COUNT = 50; // Poucas partículas, mas bonitas
+            let time = 0;
+
+            const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                s: Math.random() * 0.5 + 0.2, // velocidade
+                r: Math.random() * 2 + 1,
+                h: Math.random() * 30 + 200 // Tons de azul/roxo
+            }));
+
+            function draw(t) {
+                time += 0.005;
+                ctx.clearRect(0, 0, w, h);
+
+                // Fundo Profundo Simples (Gradiente é pesado, cor sólida é ultra leve)
+                ctx.fillStyle = "#02020a";
+                ctx.fillRect(0, 0, w, h);
+
+                // 1. A Malha Viva (Otimizada)
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba(100, 150, 255, 0.15)";
+                ctx.lineWidth = 1;
+
+                for (let i = 0; i < w; i += GRID_SIZE) {
+                    ctx.moveTo(i, 0);
+                    for (let j = 0; j < h; j += 30) {
+                        // O segredo do movimento surreal:
+                        const shift = Math.sin(j * 0.01 + time + i * 0.02) * 15;
+                        ctx.lineTo(i + shift, j);
+                    }
+                }
+                for (let j = 0; j < h; j += GRID_SIZE) {
+                    ctx.moveTo(0, j);
+                    for (let i = 0; i < w; i += 30) {
+                        const shift = Math.cos(i * 0.01 + time + j * 0.02) * 15;
+                        ctx.lineTo(i, j + shift);
+                    }
+                }
+                ctx.stroke();
+
+                // 2. Partículas Encantadas (Leves)
+                particles.forEach(p => {
+                    p.y -= p.s;
+                    p.x += Math.sin(time + p.y * 0.01) * 0.3;
+
+                    if (p.y < -10) p.y = h + 10;
+
+                    ctx.fillStyle = `hsla(${p.h}, 70%, 70%, 0.6)`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Brilho da partícula (sem shadowBlur para não travar)
+                    ctx.fillStyle = `hsla(${p.h}, 70%, 70%, 0.15)`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(draw);
+            }
+
+            draw();
+        })();
+
+    </script>
+
+    <div id="cat-interface"
+        style="position: fixed; top: 100px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: auto;">
+        <div id="cat-btn"
+            style="width: 60px; height: 60px; border-radius: 50%; background: #222; border: 3px solid #444; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; text-align: center; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: relative; overflow: hidden;">
+            <img id="cat-btn-img" src="./webp/gato.gif" onerror="this.src='./webp/explosao.gif'"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: filter 0.5s; z-index: 1; opacity: 0.6;">
+            <span id="cat-btn-text"
+                style="position: relative; z-index: 2; text-shadow: 0 0 4px black;">FELIX<br>0%</span>
+        </div>
+        <div
+            style="width: 60px; height: 6px; background: #000; border-radius: 3px; border: 1px solid #555; overflow: hidden;">
+            <div id="cat-bar" style="width: 0%; height: 100%; background: #00ffcc; transition: width 0.3s;"></div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const initCat = () => {
+                const gameWorld = document.getElementById('game-world');
+                if (!gameWorld) return;
+
+                const canvas = document.createElement('canvas');
+                canvas.id = "magicCatCanvas";
+                canvas.width = 100; canvas.height = 100;
+                canvas.style.position = "absolute";
+                canvas.style.zIndex = "1000";
+                canvas.style.pointerEvents = "none";
+                gameWorld.appendChild(canvas);
+
+                const ctx = canvas.getContext('2d');
+                const btn = document.getElementById('cat-btn');
+                const bar = document.getElementById('cat-bar');
+
+                // GIFs de explosão (você pode trocar esses URLs por outros GIFs)
+                const explosionGifs = [
+                    './webp/explosao.gif',  // Explosão colorida
+                    './webp/explosao1.gif',  // Explosão de fogo
+                    './webp/explosao.gif',   // Explosão pixelada
+                    './webp/explosao1.gif'  // Explosão com efeito
+                ];
+
+                let cat = { x: 0, y: 0, charge: 0, mode: 'follow', timer: 0, lastHitTime: 0 };
+
+                function drawCat(x, y, isTigre) {
+                    ctx.clearRect(0, 0, 100, 100);
+                    ctx.save();
+                    ctx.translate(50, 50);
+
+                    // Asinhas batendo
+                    let wing = Math.sin(Date.now() * 0.01) * 10;
+                    ctx.strokeStyle = isTigre ? "#ff3300" : "#00ffcc";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0); ctx.lineTo(-15, -10 + wing);
+                    ctx.moveTo(0, 0); ctx.lineTo(-15, 10 - wing);
+                    ctx.stroke();
+
+                    // Corpo
+                    ctx.fillStyle = isTigre ? "#ff6600" : "#ffffff";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = ctx.fillStyle;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, isTigre ? 20 : 10, isTigre ? 12 : 6, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Cabeça e Orelhas
+                    ctx.beginPath();
+                    ctx.arc(10, -5, isTigre ? 10 : 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                // Função para criar explosão
+                function createExplosion(x, y) {
+                    const explosion = document.createElement('div');
+                    const randomGif = explosionGifs[Math.floor(Math.random() * explosionGifs.length)];
+
+                    explosion.innerHTML = `
+                        <img src="${randomGif}" 
+                             style="width: 80px; height: 80px; position: absolute; z-index: 1001; pointer-events: none;"
+                             alt="Explosion">
+                    `;
+
+                    explosion.style.position = 'absolute';
+                    // Ajuste para sistema de coordenadas do jogo (0 é chão/bottom)
+                    explosion.style.bottom = '0px';
+                    explosion.style.left = '0px';
+                    // Centraliza o sprite 80x80 horizontalmente (x - 40)
+                    // Verticalmente, o 'y' passado já deve ser o translateY correto (negativo para subir)
+                    // Se passarmos -target.y (onde target.y é chão), y=0 -> bottom 0.
+                    explosion.style.transform = `translate3d(${x - 40}px, ${y}px, 0)`;
+                    explosion.style.zIndex = '1001';
+                    explosion.style.pointerEvents = 'none';
+
+                    // Adiciona efeito de sombra/brilho
+                    explosion.style.filter = 'brightness(1.5) drop-shadow(0 0 10px #ff3300)';
+
+                    gameWorld.appendChild(explosion);
+
+                    // Remove após 0.5 segundos (tempo do GIF)
+                    setTimeout(() => {
+                        if (explosion.parentNode) {
+                            explosion.parentNode.removeChild(explosion);
+                        }
+                    }, 500);
+                }
+
+                // Função para criar múltiplas explosões
+                function createExplosionCluster(x, y, count = 3) {
+                    for (let i = 0; i < count; i++) {
+                        setTimeout(() => {
+                            const offsetX = (Math.random() - 0.5) * 50;
+                            const offsetY = (Math.random() - 0.5) * 50;
+                            createExplosion(x + offsetX, y + offsetY);
+                        }, i * 50); // Pequeno delay entre explosões
+                    }
+                }
+
+                const btnText = document.getElementById('cat-btn-text');
+                const btnImg = document.getElementById('cat-btn-img');
+
+                btn.onclick = () => {
+                    if (cat.charge >= 100 && cat.mode === 'follow') {
+                        cat.mode = 'tiger';
+                        cat.timer = 400; // Duração
+                        cat.charge = 0;
+                        btn.style.borderColor = "#ff0000";
+                        btn.style.boxShadow = "0 0 20px #ff3300";
+                        btnText.innerHTML = "TIGRE!";
+
+                        // Efeito de explosão ao ativar (centrado no gato)
+                        setTimeout(() => {
+                            createExplosion(cat.x, 40 - cat.y);
+                        }, 100);
+                    }
+                };
+
+                function update() {
+                    const playerElem = document.querySelector('.character');
+                    if (!playerElem) { requestAnimationFrame(update); return; }
+
+                    // Pegar posição do player no mundo
+                    let px = parseFloat(playerElem.style.getPropertyValue('--translateX')) || 0;
+                    let py = parseFloat(playerElem.style.getPropertyValue('--translateY')) || 0;
+
+                    if (cat.mode === 'tiger') {
+                        let target = null;
+                        let hitEnemy = false;
+
+                        // Garante que a imagem fique colorida no modo tigre
+                        if (btnImg) btnImg.style.filter = 'grayscale(0%)';
+
+                        if (window.game && window.game.enemies) {
+                            let minDist = 400;
+                            window.game.enemies.forEach(en => {
+                                let d = Math.sqrt((en.x - cat.x) ** 2 + (en.y - cat.y) ** 2);
+                                if (d < minDist && !en.isDead) {
+                                    minDist = d;
+                                    target = en;
+                                }
+                            });
+
+                            if (target) {
+                                cat.x += (target.x - cat.x) * 0.15;
+                                cat.y += (target.y + 40 - cat.y) * 0.15;
+
+                                // Verifica se atingiu o inimigo
+                                if (Math.abs(cat.x - target.x) < 50) {
+                                    const now = Date.now();
+                                    // Limita hits para evitar muitas explosões
+                                    if (now - cat.lastHitTime > 200) { // 200ms entre hits
+                                        target.takeDamage(1);
+                                        cat.lastHitTime = now;
+                                        hitEnemy = true;
+
+                                        // Cria explosão no inimigo (USANDO POSIÇÃO DO INIMIGO PARA PRECISÃO)
+                                        createExplosion(target.x, -target.y);
+
+                                        // Pequena explosão aleatória próxima
+                                        if (Math.random() > 0.7) {
+                                            createExplosionCluster(target.x, -target.y, 2);
+                                        }
+                                    }
+                                }
+                            } else {
+                                cat.mode = 'follow';
+                            }
+                        } else {
+                            cat.mode = 'follow';
+                        }
+
+                        cat.timer--;
+                        if (cat.timer <= 0) {
+                            cat.mode = 'follow';
+                            btn.style.borderColor = "#444";
+                            btn.style.boxShadow = "0 4px 10px rgba(0,0,0,0.5)";
+
+                            // Explosão final ao terminar modo tigre
+                            createExplosionCluster(cat.x, 40 - cat.y, 3);
+                        }
+
+                        // Ocasionalmente cria pequenas explosões enquanto está no modo tigre
+                        if (Math.random() < 0.03 && cat.mode === 'tiger') {
+                            const offsetX = (Math.random() - 0.5) * 100;
+                            const offsetY = (Math.random() - 0.5) * 100;
+                            createExplosion(cat.x + offsetX, (40 - cat.y) + offsetY);
+                        }
+                    } else {
+                        // Seguir Player
+                        let tx = px - 60;
+                        let ty = -py + 60 + Math.sin(Date.now() * 0.003) * 20;
+                        cat.x += (tx - cat.x) * 0.1;
+                        cat.y += (ty - cat.y) * 0.1;
+
+                        if (cat.charge < 100) {
+                            cat.charge += 0.05;
+                            bar.style.width = cat.charge + "%";
+                            btnText.innerHTML = Math.floor(cat.charge) + "%";
+                            if (btnImg) btnImg.style.filter = 'grayscale(100%)';
+
+                            if (cat.charge >= 100) {
+                                btn.style.borderColor = "#00ffcc";
+                                btn.style.boxShadow = "0 0 15px #00ffcc";
+                                btnText.innerHTML = "PRONTO";
+                                if (btnImg) btnImg.style.filter = 'grayscale(0%)';
+                            }
+                        }
+                    }
+
+                    canvas.style.transform = `translateX(${cat.x - 50}px) translateY(${-cat.y - 50}px)`;
+                    drawCat(cat.x, cat.y, cat.mode === 'tiger');
+                    requestAnimationFrame(update);
+                }
+                update();
+            };
+
+            // Espera o DOM carregar
+            if (document.readyState === 'complete') initCat();
+            else window.addEventListener('load', initCat);
+        })();
+    </script>
+
+
+    <script src="https://pixijs.download/release/pixi.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="./js/game.js"></script>
+</body>
+
+</html>
