@@ -1227,3 +1227,57 @@ body {
     50% { opacity: 0.7; }
     100% { opacity: 1; }
 }
+
+@keyframes victoryPopup {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+        opacity: 0;
+        filter: blur(10px);
+    }
+    20% {
+        transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+        opacity: 1;
+        filter: blur(0);
+    }
+    25% {
+        transform: translate(-50%, -50%) scale(1) rotate(0);
+    }
+    80% {
+        transform: translate(-50%, -50%) scale(1) rotate(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0.8) rotate(0);
+        opacity: 0;
+        filter: blur(5px);
+    }
+}
+
+.transition-portal-container {
+    /* Mantém o container como uma caixa de colisão */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Empurra o conteúdo visual para o chão */
+    align-items: center;
+}
+
+.particle-portal {
+    position: relative;
+    /* Remova qualquer 'bottom' antigo daqui */
+    bottom: 0px; 
+    width: 90px;
+    height: 90px;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.9) 0%, rgba(0, 150, 255, 0.3) 50%, transparent 75%);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    
+    /* Centraliza a pulsação na base */
+    transform-origin: bottom center; 
+    animation: portalSpin 4s linear infinite, portalPulse 2s ease-in-out infinite;
+}
+
+@keyframes portalPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
