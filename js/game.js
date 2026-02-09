@@ -175,7 +175,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('load', adjustGameScale);
     setTimeout(adjustGameScale, 100);
     const CONFIG = {
-        DEBUG_MODE: false,
+        DEBUG_MODE: true,
         PLAYER_SPEED: 7, 
         PLAYER_ACCELERATION: 1.5,
         PLAYER_FRICTION: 0.8,
@@ -2214,16 +2214,21 @@ update() {
 
     class Boss extends Entity {
         constructor(x, y, game) {
+    
             super(x, y, 600, 700);
             this.game = game;
             this.element.className = 'boss-entity';
-            this.health = 150;
+            this.health = 1;
             this.maxHealth = 150;
             this.isDead = false;
             this.attackTimer = 0;
             this.attackInterval = 4000;
             this.hasSpawnedProjectiles = false;
             this.activated = false;
+            
+            this.isLowHealth = false;
+    this.lastStandInterval = null;
+    this.knockoutExecuted = false;
 
             // Garante que a barra de vida seja criada
             this.createHealthBar();
@@ -2373,26 +2378,28 @@ update() {
             });
 
             // Estado 'death'
-            this.stateMachine.addState('death', {
-                enter: () => {
-                    this.isDead = true;
-                    // Animation frames, duration 100ms, loop = false
-                    this.setAnimation(ASSETS.boss_death, 100, false);
-                    this.hideHealthBar();
-
-                    this.updateUIHealthBar();
-
-                    if (this.game) {
-                        this.game.addPoints(100, 'boss');
-                    }
-                },
-                update: () => {
-                    // Ao terminar a animação, remove o boss do DOM (opcional) ou deixa o corpo lá
-                    if (this.frame === ASSETS.boss_death.length - 1) {
-                        // Pode adicionar lógica extra aqui se quiser que ele suma depois
-                    }
-                }
-            });
+// No initStates() do Boss, no estado 'death':
+this.stateMachine.addState('death', {
+    enter: () => {
+        this.isDead = true;
+        this.setAnimation(ASSETS.boss_death, 100, false);
+        
+        // Efeito de desaparecimento
+        setTimeout(() => {
+            this.element.style.transition = 'opacity 2s, transform 2s';
+            this.element.style.opacity = '0';
+            this.element.style.transform = `translateX(${this.x}px) translateY(${-this.y}px) scale(0.8)`;
+        }, 1000);
+        
+        // Remove completamente após um tempo
+        setTimeout(() => {
+            this.element.style.display = 'none';
+        }, 3000);
+    },
+    update: () => {
+        // Nada aqui - só deixa a animação rodar
+    }
+});
         }
 
         // Método para atualizar a barra na UI superior
@@ -2442,34 +2449,383 @@ update() {
         }
 
         takeDamage(amount) {
-            if (this.isDead || !this.activated) return false;
+    if (this.isDead || !this.activated) return false;
 
-            this.health -= amount;
+    this.health -= amount;
 
-            // Atualiza ambas as barras de vida
-            this.updateHealthBar();
-            this.updateUIHealthBar();
+    // Efeito visual de dano
+    this.element.style.filter = 'brightness(2) sepia(1)';
+    
+    // Tremor na tela (para danos fortes)
+    if (amount >= 5) {
+        this.game.screenShake(15, 200);
+    }
+    
+    // Feedback de dano crítico
+    if (amount >= 10) {
+        this.showDamageText(`CRÍTICO! -${amount}`, '#FF0000');
+    }
 
-            // Feedback visual
-            this.element.style.filter = 'brightness(2) sepia(1)';
-            setTimeout(() => {
-                if (!this.isDead) this.element.style.filter = '';
-            }, 100);
+    // Atualiza as barras de vida
+    this.updateHealthBar();
+    this.updateUIHealthBar();
 
-            // Verifica se morreu
-            if (this.health <= 0) {
-                this.health = 0;
-                this.stateMachine.setState('death');
-                return true;
-            }
+    // Verifica se está prestes a morrer (último 10%)
+    if (this.health <= this.maxHealth * 0.1 && !this.isLowHealth) {
+        this.isLowHealth = true;
+        this.activateLastStand();
+    }
 
-            // Adiciona pontos
-            if (this.game && amount > 0) {
-                this.game.addPoints(Math.floor(amount * 2), 'boss');
-            }
+    // Verifica se morreu
+    if (this.health <= 0) {
+        this.health = 0;
+        this.executeKnockout();
+        return true;
+    }
 
-            return true;
+    // Efeito temporário
+    setTimeout(() => {
+        if (!this.isDead) this.element.style.filter = '';
+    }, 100);
+
+    // Pontos
+    if (this.game && amount > 0) {
+        this.game.addPoints(Math.floor(amount * 2), 'boss');
+    }
+
+    return true;
+}
+
+executeKnockout() {
+    if (this.isDead) return;
+  
+    
+    this.isDead = true;
+    
+    // 1. Efeito de tremor
+    this.game.screenShake(20, 800);
+    
+    // 2. Slow motion breve
+    this.game.slowMotion(0.4, 1200);
+    
+    // 3. Animação de morte normal
+    this.stateMachine.setState('death');
+    
+    // 4. Texto "VITÓRIA" (aparece e some sozinho)
+    this.showVictoryText();
+    
+    if (this.game) this.game.createTransitionAfterBoss(); 
+    
+    // 5. Partículas de vitória
+    this.spawnVictoryParticles();
+    
+    // 6. Pontuação extra
+    if (this.game) {
+        this.game.addPoints(500, 'boss_defeat');
+    }
+    
+    // 7. Remove barreiras após um tempo
+    setTimeout(() => {
+        if (this.game) {
+            this.game.removeBossBarriers();
+            this.game.bossArena.active = false;
+            
+            // Cura o jogador um pouco como recompensa
+            this.game.player.health = Math.min(
+                this.game.player.health + 2, 
+                CONFIG.PLAYER_HEALTH
+            );
+            this.game.updateBloodHealthBar();
         }
+    }, 1500);
+}
+
+showVictoryText() {
+    const victoryText = document.createElement('div');
+    victoryText.className = 'victory-text-cuphead';
+    victoryText.textContent = 'VITÓRIA';
+    
+    victoryText.style.cssText = `
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 100px;
+        font-weight: 900;
+        font-family: 'Impact', 'Arial Black', sans-serif;
+        color: #FFD700;
+        text-shadow: 
+            0 0 15px #FF4500,
+            0 0 30px #FF0000,
+            3px 3px 0 #000,
+            -3px -3px 0 #000,
+            3px -3px 0 #000,
+            -3px 3px 0 #000;
+        letter-spacing: 8px;
+        z-index: 10000;
+        pointer-events: none;
+        animation: victoryPopup 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    `;
+    
+    document.getElementById('game-container').appendChild(victoryText);
+    
+    // Remove automaticamente após a animação
+    setTimeout(() => {
+        if (victoryText.parentElement) {
+            victoryText.remove();
+        }
+    }, 2500);
+}
+
+spawnVictoryParticles() {
+    // Partículas douradas simples
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+            this.createGoldParticle();
+        }, i * 30);
+    }
+}
+
+createGoldParticle() {
+    const particle = document.createElement('div');
+    particle.style.cssText = `
+        position: absolute;
+        width: ${15 + Math.random() * 20}px;
+        height: ${15 + Math.random() * 20}px;
+        background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
+        border-radius: 50%;
+        left: ${this.x + this.width/2}px;
+        bottom: ${this.y + this.height/2}px;
+        pointer-events: none;
+        z-index: 999;
+        transform: translate(-50%, -50%);
+        filter: drop-shadow(0 0 5px gold);
+    `;
+    
+    this.game.gameWorld.appendChild(particle);
+    
+    // Animação simples
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 50 + Math.random() * 100;
+    
+    particle.animate([
+        { 
+            transform: `translate(-50%, -50%) scale(1)`,
+            opacity: 1 
+        },
+        { 
+            transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+            opacity: 0 
+        }
+    ], {
+        duration: 800 + Math.random() * 400,
+        easing: 'ease-out'
+    }).onfinish = () => particle.remove();
+}
+
+playKnockoutAnimation() {
+    // Cria animação especial de KO
+    const koFrames = [
+        './webp/boss_ko1.webp',
+        './webp/boss_ko2.webp',
+        './webp/boss_ko3.webp',
+        './webp/boss_ko4.webp'
+    ];
+    
+    // Se não tiver frames específicos, usa os de morte com efeito extra
+    this.setAnimation(ASSETS.boss_death, 80, false);
+    
+    // Efeito de "congelamento" no frame final
+    setTimeout(() => {
+        this.element.style.filter = 'grayscale(100%) brightness(1.5)';
+        this.element.style.animation = 'bossFreeze 2s forwards';
+    }, 1000);
+}
+
+spawnKnockoutParticles() {
+    // Partículas de estrelas/destruição
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            this.createKnockoutParticle();
+        }, i * 20);
+    }
+}
+
+createKnockoutParticle() {
+    const particle = document.createElement('div');
+    particle.style.cssText = `
+        position: absolute;
+        width: ${20 + Math.random() * 30}px;
+        height: ${20 + Math.random() * 30}px;
+        background: radial-gradient(circle, 
+            #FFD700 0%, 
+            #FFA500 30%, 
+            #FF4500 70%, 
+            transparent 100%);
+        border-radius: 50%;
+        left: ${this.x + this.width/2}px;
+        bottom: ${this.y + this.height/2}px;
+        pointer-events: none;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        filter: blur(2px);
+    `;
+    
+    this.game.gameWorld.appendChild(particle);
+    
+    // Animação da partícula
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 5 + Math.random() * 10;
+    const distance = 100 + Math.random() * 200;
+    
+    const animation = particle.animate([
+        { 
+            transform: `translate(-50%, -50%) scale(1)`,
+            opacity: 1 
+        },
+        { 
+            transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+            opacity: 0 
+        }
+    ], {
+        duration: 1000 + Math.random() * 500,
+        easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+    });
+    
+    animation.onfinish = () => particle.remove();
+}
+
+showKnockoutText() {
+    const knockoutText = document.createElement('div');
+    knockoutText.className = 'knockout-text';
+    knockoutText.textContent = 'KNOCKOUT!';
+    
+    knockoutText.style.cssText = `
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 120px;
+        font-weight: 900;
+        font-family: 'Impact', 'Arial Black', sans-serif;
+        color: #FFD700;
+        text-shadow: 
+            0 0 20px #FF4500,
+            0 0 40px #FF0000,
+            0 0 60px #8B0000,
+            5px 5px 0 #000,
+            -5px -5px 0 #000,
+            5px -5px 0 #000,
+            -5px 5px 0 #000;
+        letter-spacing: 5px;
+        z-index: 10000;
+        pointer-events: none;
+        animation: knockoutText 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    `;
+    
+    document.getElementById('game-container').appendChild(knockoutText);
+    
+    // Remove após animação
+    setTimeout(() => {
+        knockoutText.remove();
+    }, 3000);
+}
+
+createFinalExplosion() {
+    const explosion = document.createElement('div');
+    explosion.className = 'final-explosion';
+    
+    explosion.style.cssText = `
+        position: absolute;
+        left: ${this.x + this.width/2 - 150}px;
+        bottom: ${this.y + this.height/2 - 150}px;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, 
+            rgba(255, 215, 0, 0.8) 0%,
+            rgba(255, 69, 0, 0.6) 30%,
+            rgba(139, 0, 0, 0.4) 60%,
+            transparent 80%);
+        z-index: 999;
+        pointer-events: none;
+        transform: scale(0);
+        animation: finalExplosion 1s ease-out forwards;
+    `;
+    
+    this.game.gameWorld.appendChild(explosion);
+    
+    setTimeout(() => {
+        if (explosion.parentElement) explosion.remove();
+    }, 1500);
+}
+
+spawnVictoryRewards() {
+    // Chuvas de moedas
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            const coinX = this.x + this.width/2 + (Math.random() - 0.5) * 400;
+            const coinY = this.y + this.height/2 + 100;
+            
+            // Moedas especiais (mais valiosas)
+            const coinValue = Math.random() > 0.7 ? 50 : 20;
+            this.game.spawnPointsPickup(coinX, coinY, coinValue);
+            
+            // Efeito extra nas moedas especiais
+            if (coinValue === 50) {
+                setTimeout(() => {
+                    this.createShiningEffect(coinX, coinY);
+                }, 300);
+            }
+        }, i * 50);
+    }
+    
+    // Itens especiais (vida extra, power-up, etc.)
+    setTimeout(() => {
+        this.spawnSpecialReward();
+    }, 800);
+}
+
+createShiningEffect(x, y) {
+    const shine = document.createElement('div');
+    shine.style.cssText = `
+        position: absolute;
+        left: ${x}px;
+        bottom: ${y}px;
+        width: 40px;
+        height: 40px;
+        background: radial-gradient(circle, 
+            rgba(255, 255, 255, 0.8) 0%,
+            rgba(255, 215, 0, 0.6) 50%,
+            transparent 70%);
+        border-radius: 50%;
+        z-index: 999;
+        pointer-events: none;
+        animation: shinePulse 1s infinite alternate;
+    `;
+    
+    this.game.gameWorld.appendChild(shine);
+    
+    setTimeout(() => shine.remove(), 2000);
+}
+
+activateLastStand() {
+    // Efeito quando o boss está com pouca vida
+    this.element.style.animation = 'bossLastStand 0.5s infinite alternate';
+    
+    // Partículas de "último esforço"
+    const lastStandInterval = setInterval(() => {
+        if (this.isDead) {
+            clearInterval(lastStandInterval);
+            return;
+        }
+        
+        this.createLastStandParticle();
+    }, 200);
+    
+    // Salva a referência para parar depois
+    this.lastStandInterval = lastStandInterval;
+}
 
         update(dt) {
             this.stateMachine.update(dt);
@@ -2495,6 +2851,72 @@ update() {
             this.element.style.transform = `translateX(${Math.round(this.x)}px) translateY(${Math.round(-this.y)}px) scaleX(1)`;
         }
     }
+    
+class HiddenTransitionItem extends Entity {
+    constructor(x, y, nextLevelUrl) {
+        // x = final da fase (ex: 6300), y = altura (0)
+        super(x, y, 150, 200); // Hitbox um pouco maior para garantir que o player encoste
+        this.nextLevelUrl = nextLevelUrl;
+        this.isActive = false;
+        
+        // Container invisível
+        this.element.className = 'transition-portal-invisible';
+        this.element.style.cssText = `
+            position: absolute;
+            width: 150px;
+            height: 200px;
+            z-index: -1; /* Fica atrás de tudo */
+            pointer-events: none;
+            background: transparent; /* Totalmente transparente */
+        `;
+    }
+
+    update(deltaTime) {
+        if (!this.game || !this.game.player || this.isActive) return;
+
+        const player = this.game.player;
+        const playerHitbox = player.getHitbox();
+
+        // Hitbox de detecção (baseada no bottom)
+        const portalHitbox = {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height
+        };
+
+        // Se encostar no final da fase, transiciona suavemente
+        if (checkCollision(playerHitbox, portalHitbox)) {
+            this.activatePortal();
+        }
+    }
+
+    activatePortal() {
+        this.isActive = true;
+        
+        // Overlay branco suave para a transição (sem textos)
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 10000; pointer-events: none;
+            opacity: 0; transition: opacity 1.5s ease-in-out;
+        `;
+        document.body.appendChild(overlay);
+
+        // Inicia o fade out da tela
+        setTimeout(() => { overlay.style.opacity = '1'; }, 50);
+
+        setTimeout(() => {
+            window.location.href = this.nextLevelUrl;
+        }, 1600);
+    }
+
+    draw() {
+        // Posicionamento no final da fase
+        this.element.style.transform = `translateX(${Math.round(this.x)}px) translateY(${Math.round(-this.y)}px)`;
+    }
+}
+
 
     class PointsPickup extends Entity {
         constructor(x, y, pointsValue = 10) {
@@ -2696,6 +3118,8 @@ class ParallaxSystem {
         this.specialCharge = 0;
         this.createBloodHealthBar();
         
+        this.transitionSystem = null;
+        
         // =========== NOVAS PROPRIEDADES DA CÂMERA ===========
         this.cameraOffsetY = 0;           // Offset vertical da câmera
         this.targetCameraOffsetY = 0;     // Offset alvo para suavização
@@ -2786,6 +3210,208 @@ class ParallaxSystem {
         bloodBar.appendChild(bloodFill);
         document.getElementById('game-container').appendChild(bloodBar);
     }
+    
+createTransitionAfterBoss() {
+    if (this.transitionSystem) return;
+
+    // Pixel 6300 é o fim da fase
+    const spawnX = 6300; 
+    const spawnY = 0; 
+
+    this.transitionSystem = new HiddenTransitionItem(spawnX, spawnY, 'fase2.html');
+    this.transitionSystem.game = this;
+    
+    // Adiciona ao mundo (ele estará lá, mas transparente)
+    this.gameWorld.appendChild(this.transitionSystem.element);
+    
+    console.log('🏁 Sensor de final de fase ativado (invisível)');
+}
+
+
+screenShake(intensity, duration) {
+    const gameWorld = this.gameWorld;
+    const originalTransform = gameWorld.style.transform;
+    
+    let shakeCount = 0;
+    const maxShakes = duration / 50; // 50ms por shake
+    
+    const shakeInterval = setInterval(() => {
+        const x = (Math.random() - 0.5) * intensity * 2;
+        const y = (Math.random() - 0.5) * intensity;
+        
+        // Aplica o shake no offset da câmera
+        this.worldX += x;
+        this.cameraOffsetY += y;
+        
+        shakeCount++;
+        
+        if (shakeCount >= maxShakes) {
+            clearInterval(shakeInterval);
+            // Volta suavemente à posição original
+            setTimeout(() => {
+                // O draw() normal já vai suavizar de volta
+            }, 100);
+        }
+    }, 50);
+}
+
+pauseGameplay(duration) {
+    this.isPaused = true;
+    
+    // Salva o estado das animações
+    this.savedAnimations = [];
+    document.querySelectorAll('*').forEach(el => {
+        const animation = getComputedStyle(el).animation;
+        if (animation && animation !== 'none') {
+            this.savedAnimations.push({element: el, animation: animation});
+            el.style.animationPlayState = 'paused';
+        }
+    });
+    
+    // Retorna após a duração
+    setTimeout(() => {
+        this.isPaused = false;
+        this.savedAnimations.forEach(item => {
+            item.element.style.animationPlayState = 'running';
+        });
+    }, duration);
+}
+
+// Na classe Game:
+slowMotion(speed, duration) {
+    // Apenas ajusta a velocidade por um tempo
+    const originalFrameInterval = frameInterval;
+    frameInterval = frameInterval / speed;
+    
+    setTimeout(() => {
+        frameInterval = originalFrameInterval;
+    }, duration);
+}
+
+screenShake(intensity, duration) {
+    const originalWorldX = this.worldX;
+    const originalCameraY = this.cameraOffsetY;
+    
+    let elapsed = 0;
+    const shake = () => {
+        if (elapsed >= duration) {
+            this.worldX = originalWorldX;
+            this.cameraOffsetY = originalCameraY;
+            return;
+        }
+        
+        const currentIntensity = intensity * (1 - elapsed / duration);
+        this.worldX = originalWorldX + (Math.random() - 0.5) * currentIntensity;
+        this.cameraOffsetY = originalCameraY + (Math.random() - 0.5) * currentIntensity * 0.5;
+        
+        elapsed += 16;
+        requestAnimationFrame(shake);
+    };
+    
+    shake();
+}
+
+showVictoryScreen() {
+    setTimeout(() => {
+        const victoryScreen = document.createElement('div');
+        victoryScreen.className = 'victory-screen';
+        
+        victoryScreen.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(0,0,0,0.9) 0%,
+                rgba(139,0,0,0.7) 50%,
+                rgba(0,0,0,0.9) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+            font-family: 'Arial Black', sans-serif;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        `;
+        
+        victoryScreen.innerHTML = `
+            <div style="text-align: center;">
+                <h1 style="font-size: 72px; color: #FFD700; margin-bottom: 20px;
+                    text-shadow: 0 0 30px #FF4500;">
+                    VITÓRIA!
+                </h1>
+                
+                <div style="font-size: 36px; margin: 30px 0;">
+                    <p>Boss Derrotado!</p>
+                    <p style="color: #00FF00; font-size: 48px; margin-top: 10px;">
+                        +1000 Pontos
+                    </p>
+                </div>
+                
+                <div style="margin: 40px 0;">
+                    <p style="font-size: 24px; color: #FFA500;">Recompensas:</p>
+                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+                        <div style="text-align: center;">
+                            <img src="./webp/coin.webp" style="width: 50px; height: 50px;">
+                            <p>+30 Moedas</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="./webp/heart.webp" style="width: 50px; height: 50px;">
+                            <p>Vida Extra</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 50px;">
+                    <p style="font-size: 20px; color: #AAA;">Próximo nível desbloqueado!</p>
+                    <button id="continue-btn" style="
+                        margin-top: 30px;
+                        padding: 20px 40px;
+                        font-size: 24px;
+                        background: linear-gradient(45deg, #FFD700, #FF8C00);
+                        color: black;
+                        border: none;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        transition: transform 0.3s, box-shadow 0.3s;
+                        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+                    ">CONTINUAR</button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('game-container').appendChild(victoryScreen);
+        
+        // Anima a entrada
+        setTimeout(() => {
+            victoryScreen.style.opacity = '1';
+        }, 100);
+        
+        // Botão continuar
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            victoryScreen.style.animation = 'fadeOut 1s forwards';
+            setTimeout(() => {
+                if (victoryScreen.parentElement) {
+                    victoryScreen.remove();
+                }
+                // Aqui você pode carregar o próximo nível
+                console.log('Próximo nível...');
+            }, 1000);
+        });
+        
+        // Adiciona pontos extras
+        this.addPoints(1000, 'boss_defeat');
+        
+        // Dá vida extra ao jogador
+        this.player.health = CONFIG.PLAYER_HEALTH;
+        this.updateBloodHealthBar();
+        
+    }, 2500); // 2.5 segundos após o KO
+}
 
 
 // Atualize a barra de sangue quando a vida mudar
@@ -3799,6 +4425,12 @@ applyPitKnockback() {
                     const bossUI = document.getElementById('boss-ui');
                     if (bossUI) setTimeout(() => bossUI.style.display = 'none', 2000);
                 }
+                if (this.boss && this.boss.isDead && !this.transitionSystem) {
+            this.createTransitionAfterBoss();
+        }
+        
+        // Atualiza o sistema de transição
+        
             }
         }
 
@@ -3936,6 +4568,10 @@ applyPitKnockback() {
         this.playerProjectiles = this.playerProjectiles.filter(p => !p.isMarkedForDeletion);
         this.enemyProjectiles = this.enemyProjectiles.filter(p => !p.isMarkedForDeletion);
         this.pickupItems = this.pickupItems.filter(i => !i.isMarkedForDeletion);
+        
+        if (this.transitionSystem) {
+        this.transitionSystem.update(deltaTime);
+    }
     }
 
 draw() {
@@ -3944,7 +4580,7 @@ draw() {
     const targetWorldX = -this.player.x + CONFIG.GAME_WIDTH / 4;
     this.worldX += (targetWorldX - this.worldX) * CONFIG.CAMERA_SMOOTHING;
 
-    const minX = -6200 + CONFIG.GAME_WIDTH;
+    const minX = -6400 + CONFIG.GAME_WIDTH;
     const maxX = 50;
     this.worldX = Math.max(minX, Math.min(maxX, this.worldX));
 
@@ -3969,6 +4605,9 @@ requestAnimationFrame(() => {
     this.playerProjectiles.forEach(p => p.draw());
     this.enemyProjectiles.forEach(p => p.draw());
     this.pickupItems.forEach(i => i.draw());
+        if (this.transitionSystem) {
+        this.transitionSystem.draw();
+    }
 }
 
     drawDebug() {
