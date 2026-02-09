@@ -175,7 +175,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('load', adjustGameScale);
     setTimeout(adjustGameScale, 100);
     const CONFIG = {
-        DEBUG_MODE: true,
+        DEBUG_MODE: false,
         PLAYER_SPEED: 7, 
         PLAYER_ACCELERATION: 1.5,
         PLAYER_FRICTION: 0.8,
